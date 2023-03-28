@@ -47,11 +47,44 @@ all: setup binaries verify
 #fast: @ run build process for only linuxamd64
 fast: setup linuxamd64
 
-#binaries: @ list of binary formats to build
+#builddocker @ run build process for all Linux binaries necessary to build Docker image
+builddocker: linuxamd64 linuxarm linuxarm64
+
+#binaries: @ build list of binaries
 binaries: linux386 linuxamd64 linuxarm linuxarm64 darwinamd64 darwinarm64 win386 winamd64
 
 #setup: @ setup commands to always run
 setup: getdeps format
+
+#runopenldap: @ build and run glauth with an LDAP Backend
+runopenldap: setup cleanupopenldap
+	docker run \
+		--rm \
+		-d \
+		-p 389:389 \
+		--name openldap-service \
+		--hostname ldap-service \
+		--env LDAP_ORGANISATION="GLauth" \
+		--env LDAP_DOMAIN="glauth.com" \
+		--env LDAP_ADMIN_PASSWORD="password" \
+		--env LDAP_CONFIG_PASSWORD="password" \
+		--env LDAP_BASE_DN="dc=glauth,dc=com" \
+		-v ${CURDIR}/misc/openldap/config:/etc/ldap/slapd.d \
+		-v ${CURDIR}/misc/openldap/db:/var/lib/ldap \
+		osixia/openldap:latest
+	docker run \
+		--rm \
+		-d \
+		-p 443:443 \
+		--name phpldapadmin-service \
+		--hostname phpldapadmin-service \
+		--link openldap-service:ldap-host \
+		--env PHPLDAPADMIN_LDAP_HOSTS=ldap-service \
+		osixia/phpldapadmin:latest
+
+cleanupopenldap:
+	@docker stop openldap-service || echo "OpenLDAP server not running"
+	@docker stop phpldapadmin-service || echo "LDAP Admin service not running"
 
 #####################
 # Subcommands

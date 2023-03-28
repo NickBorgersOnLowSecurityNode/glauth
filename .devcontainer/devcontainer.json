@@ -20,7 +20,9 @@
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
-			"settings": {},
+			"settings": {
+				"go.inferGopath": true
+			},
 			"extensions": [
 				"golang.go",
 				"ms-azuretools.vscode-docker"
@@ -38,13 +40,13 @@
 	// Use 'portsAttributes' to set default properties for specific forwarded ports. 
 	// More info: https://containers.dev/implementors/json_reference/#port-attributes
 	"portsAttributes": {
-		"389": {
+		"3893": {
 			"label": "LDAP",
 			"onAutoForward": "notify"
 		},
-        "636": {
-			"label": "LDAPS",
-			"onAutoForward": "notify"
+		"443": {
+			"label": "Management container for OpenLDAP",
+			"onAutoForward": "openBrowser"
 		},
 		"5555": {
 			"label": "Web",
@@ -52,5 +54,6 @@
 		}
 	},
 
-	"postCreateCommand": "cd v2 && make setup"
+	"workspaceFolder": "/workspaces/glauth/v2/",
+	"postCreateCommand": "make setup"
 }
