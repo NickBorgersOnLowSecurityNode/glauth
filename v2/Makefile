@@ -57,7 +57,7 @@ binaries: linux386 linuxamd64 linuxarm linuxarm64 darwinamd64 darwinarm64 win386
 setup: getdeps format
 
 #runopenldap: @ build and run glauth with an LDAP Backend
-runopenldap: setup cleanupopenldap
+runopenldap: cleanupopenldap
 	docker run \
 		--rm \
 		-d \
